@@ -60,7 +60,32 @@ namespace LinqToEntities
                 }
 
 
+                //contando todas as músicas pertencentes a um determinado artista
+
+
+                var queryCount = from f in context.Faixas where f.Album.Artista.Nome.Contains("U2") select f;
+
+
+                var quantidade = queryCount.Count();
+
+                Console.WriteLine("\n Existem {0} músicas do U2 no banco de dados.\n", quantidade);
+
+                queryCount = queryCount.OrderBy(f => f.Nome);
+
+                foreach (var item in queryCount)
+                {
+                    Console.WriteLine("Músicas do U2 {0}", item.Nome);
+
+                }
+
+
+
+
+
+
             }
+
+
 
 
 
