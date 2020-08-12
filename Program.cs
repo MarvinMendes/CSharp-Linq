@@ -47,6 +47,19 @@ namespace LinqToEntities
                 }
 
 
+                Console.WriteLine("\n Busca com métodos");
+                var queryOrder = from a in context.Albums join f in context.Faixas on a.AlbumId equals f.AlbumId select new { album = a.Titulo, faixas = f.Nome };
+
+                queryOrder = queryOrder.Where(a => a.album.Contains("How To Dismantle An Atomic Bomb"));
+
+                queryOrder = queryOrder.OrderBy(f => f.faixas);
+
+                foreach (var item in queryOrder)
+                {
+                    Console.WriteLine("Álbum: " + item.album + " Faixas: " + item.faixas);
+                }
+
+
             }
 
 
