@@ -153,8 +153,47 @@ namespace LinqToEntities
                 {
                     Console.WriteLine("\nTítulo do álbum {0}, Gasto com o Álbum {1}", item.tituloAlbum, item.totalAlbum);                        
                 }
-               // Console.WriteLine("Total de músicas: {0}", total);
+                // Console.WriteLine("Total de músicas: {0}", total);
                 //Console.WriteLine("Total da soma: {0}", quantidadeVendidas);
+
+
+                Console.WriteLine("\n");
+
+
+                var musicasVendidas = from it in context.ItemNotaFiscals
+                                      where it.Faixa.Album.Artista.Nome.Contains("U2")
+                                      group it by it.Faixa into agupadoFaixa
+                                      select new { nome = agupadoFaixa.Key.Nome, unitario = agupadoFaixa.Key.PrecoUnitario, 
+                                          totalMusicas = agupadoFaixa.Sum(p =>  p.Quantidade) };
+
+                musicasVendidas = musicasVendidas.OrderByDescending(q => q.totalMusicas);
+
+                foreach (var item in musicasVendidas)
+                {
+                    Console.WriteLine("\nMusica vendida {0} - Preço unitário: {1} - Quantidade de vezes que foi comprada: {2}" , item.nome, item.unitario, item.totalMusicas);
+                }
+                Console.WriteLine("\n");
+
+                //trazendo as musicas vendidas de um artista, a quantidade de venda de cada uma e o somatório final de todas as músicas vendidas deste artista
+
+
+                var MusicasVendidas = from it in context.ItemNotaFiscals
+                                           where it.Faixa.Album.Artista.Nome.Contains("U2")
+                                           group it by it.Faixa into agrupadoFaixas
+                                           select new { nomeArtista = agrupadoFaixas.Key.Album.Artista.Nome,
+                                               nomeMusica = agrupadoFaixas.Key.Nome,
+                                               quantidade = agrupadoFaixas.Sum(quant => quant.Quantidade),
+                                               precoUnit = agrupadoFaixas.Key.PrecoUnitario };
+
+
+                var totalDeMusicasVendidas = MusicasVendidas.Sum(quant => quant.quantidade);
+                var valorTotalEmMusicas = totalDeMusicasVendidas * 0.99;
+
+                Console.WriteLine("Pegando total gasto em músicas do artista - Total de músicas vendidas: {0} - Total em dinheiro das músicas vendidas: R$ {1}", totalDeMusicasVendidas, valorTotalEmMusicas);
+                foreach (var item in MusicasVendidas)
+                {                    
+                    Console.WriteLine("Nome do artista: {0} - Nome da música: {1} - Total de vendas: {2}", item.nomeArtista, item.nomeMusica, item.quantidade );
+                }
 
             }
 
