@@ -75,13 +75,86 @@ namespace LinqToEntities
                 foreach (var item in queryCount)
                 {
                     Console.WriteLine("Músicas do U2 {0}", item.Nome);
+                }
 
+                //clientes
+                Console.WriteLine("\n");
+
+                var clientes = from c in context.Clientes select c;
+
+                clientes = clientes.Where(c => c.Pais.Contains("Brazil"));
+
+                foreach (var item in clientes)
+                {
+                    Console.WriteLine("Clientes {0}, - {1}, - {2}", item.PrimeiroNome, item.Sobrenome, item.Pais);                                       
                 }
 
 
+                //manipulando notas fiscais
+                var notasFiscais = from c in context.Clientes join nf in context.NotaFiscals on c.ClienteId
+                                   equals nf.ClienteId 
+                                   select new { client = c.PrimeiroNome, totalPedido = nf.Total };
 
 
+                notasFiscais = notasFiscais.Where(nf => nf.totalPedido > 10);
 
+                foreach (var item in notasFiscais)
+                {
+                    Console.WriteLine("Nome Cliente: {0} - Total gasto: {1}", item.client, item.totalPedido);
+
+                }
+
+                //buscando o total gasto com um determinado artista
+
+                Console.WriteLine("\n");
+                var faixasEmItemNota = from inf in context.ItemNotaFiscals
+                                 where inf.Faixa.Album.Artista.Nome.Contains("U2")
+                                 select inf;
+                                
+                //{ totalArtista = inf.PrecoUnitario * inf.Quantidade }
+                foreach (var item in faixasEmItemNota)
+                {
+                    Console.WriteLine("Nome da música comprada: " + item.Faixa.Nome + " valor da música: "   + item.Faixa.PrecoUnitario);
+                }
+
+                //navegando pelas propriedades
+
+                var totalGasto = from inf in context.ItemNotaFiscals
+                                 where inf.Faixa.Album.Artista.Nome.Contains("Marvin")
+                                 select new { totalDasFaixas = inf.PrecoUnitario * inf.Quantidade };
+
+                // Console.WriteLine("\n Total gasto");
+                // foreach (var item in totalGasto)
+                //{
+                //  Console.WriteLine("{0} ", item.totalDasFaixas);
+                //}
+
+                var artista = from f in context.Faixas where f.Album.Artista.Nome.Contains("Marvin") select f;
+
+                foreach (var item in artista)
+                {
+                    Console.WriteLine("Músicas do artista: Marvin Gaye  {0}", item.Nome);
+                }
+
+                Console.WriteLine("\nTotal gasto com as músicas do artista: {0}\n", totalGasto.Sum(f => f.totalDasFaixas));
+
+                //buscando album mais vendidos de um artista
+
+                var albunsVendidos = from it in context.ItemNotaFiscals
+                                      where it.Faixa.Album.Artista.Nome.Contains("U2")
+                                      group it by it.Faixa.Album into agrupadoIt
+                                      select new { tituloAlbum = agrupadoIt.Key.Titulo,
+                                        totalAlbum = agrupadoIt.Sum(t => t.Quantidade * t.PrecoUnitario)};
+
+
+                albunsVendidos = albunsVendidos.OrderByDescending(p => p.totalAlbum);
+
+                foreach (var item in albunsVendidos)
+                {
+                    Console.WriteLine("\nTítulo do álbum {0}, Gasto com o Álbum {1}", item.tituloAlbum, item.totalAlbum);                        
+                }
+               // Console.WriteLine("Total de músicas: {0}", total);
+                //Console.WriteLine("Total da soma: {0}", quantidadeVendidas);
 
             }
 
