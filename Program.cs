@@ -195,6 +195,39 @@ namespace LinqToEntities
                     Console.WriteLine("Nome do artista: {0} - Nome da música: {1} - Total de vendas: {2}", item.nomeArtista, item.nomeMusica, item.quantidade );
                 }
 
+
+                Console.WriteLine("\n");
+
+                //pegando as maiores, menores e a média das vendas
+
+                var maiorVenda = context.NotaFiscals.Max(nf => nf.Total);
+                var menorVenda = context.NotaFiscals.Min(nf => nf.Total);
+                var mediaVenda = context.NotaFiscals.Average(nf => nf.Total);
+
+                Console.WriteLine("A maior venda é de: R$ {0}", maiorVenda);
+                Console.WriteLine("A menor venda é de: R$ {0}", menorVenda);
+                Console.WriteLine("A média das vendas é de: R$ {0:0.##}", mediaVenda);
+
+                Console.WriteLine("\n");
+                //buscando os mesmos resultados de vendas em uma só consulta
+
+
+                var queryVendas = from nf in context.NotaFiscals
+                                  group nf by 1 into goupedResult
+                                  select new { maiorVenda = goupedResult.Max(nf => nf.Total),
+                                      menorVenda = goupedResult.Min(nf => nf.Total),
+                                      mediaVenda = goupedResult.Average(nf => nf.Total),
+                                  };
+
+
+                foreach (var venda in queryVendas)
+                {
+                    Console.WriteLine("Maior venda foi de: {0}", venda.maiorVenda);
+                    Console.WriteLine("Menor venda foi de: {0}", venda.menorVenda);
+                    Console.WriteLine("Média das vendas foi de: {0:0.##}", venda.mediaVenda);
+
+                }
+
             }
 
 
